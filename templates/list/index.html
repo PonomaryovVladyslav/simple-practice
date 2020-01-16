@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if request.user.is_authenticated %}
+        {% for note in object_list %}
+            <div style="display: flex;
+    justify-content: space-evenly;">
+                <div style="color: gray">{{ note.created_at }}</div>
+                <div>{{ note.text }}</div>
+                <form action="{% url 'note_delete' note.pk %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="Delete">
+                </form>
+            </div>
+        {% endfor %}
+        {% if object_list %}
+            <div class="pagination" style="display: flex;
+    justify-content: center;">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+            </div>
+        {% endif %}
+
+        <form style="display: flex;
+    justify-content: center;" action="{% url 'note_create' %}" method="post">
+            {% csrf_token %}
+            {{ note_form.as_p }}
+            <input type="submit" value="Create new note">
+        </form>
+
+    {% else %}
+        <div>
+            <div>
+                You are not authorized user <a href="{% url 'login' %}">Log in</a>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
